@@ -1,0 +1,133 @@
+
+/* Custom styles for Alegreya font */
+body {
+    font-family: 'Alegreya', serif;
+}
+/*logo*/
+.Logo{
+    max-width: 70%;
+    height: auto;
+    border-radius: 20px;
+
+}
+/* Basic styling for the message box */
+.message-box {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: none; /* Hidden by default */
+    transition: opacity 0.3s ease-in-out; /* Smooth fade for messages */
+}
+.message-box.show {
+    display: block;
+    opacity: 1;
+}
+.message-box.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.message-box.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+.message-box.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+/* Hide sections by default */
+.section-content {
+    display: none;
+    /* Added transition for smoother section display if using opacity/transform */
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    opacity: 0;
+    transform: translateY(20px);
+}
+.section-content.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #333; /* Darker spinner color */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Custom Modal for Confirmations */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.3s ease-in-out;
+}
+.custom-modal-overlay.show {
+    visibility: visible;
+    opacity: 1;
+}
+.custom-modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease-in-out;
+}
+.custom-modal-overlay.show .custom-modal-content {
+    transform: translateY(0);
+}
+
+/* Custom scrollbar for sidebar */
+aside::-webkit-scrollbar {
+    width: 8px;
+}
+aside::-webkit-scrollbar-track {
+    background: #f0f0f0; /* Light gray track */
+    border-radius: 10px;
+}
+aside::-webkit-scrollbar-thumb {
+    background: #888; /* Darker gray thumb */
+    border-radius: 10px;
+}
+aside::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Even darker gray on hover */
+}
+

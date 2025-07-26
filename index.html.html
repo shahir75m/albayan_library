@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css" />
+    <!-- Google Fonts - Alegreya -->
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Custom CSS -->
+   
+</head>
+
+
+
+
+
+<body class="flex min-h-screen bg-gradient-to-br from-gray-100 to-gray-200">
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="messageBox" class="message-box"></div>
+
+    <!-- Custom Confirmation Modal -->
+    <div id="confirmationModal" class="custom-modal-overlay">
+        <div class="custom-modal-content">
+            <h3 id="confirmationModalTitle" class="text-xl font-bold text-gray-800 mb-4">Confirm Action</h3>
+            <p id="confirmationModalMessage" class="text-gray-700 mb-6">Are you sure you want to proceed?</p>
+            <div class="flex justify-center space-x-4">
+                <button id="confirmYesBtn" class="px-5 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-150 ease-in-out">Yes</button>
+                <button id="confirmNoBtn" class="px-5 py-2 bg-gray-400 text-gray-900 rounded-md hover:bg-gray-500 transition duration-150 ease-in-out">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="fixed top-0 left-0 h-full w-64 bg-gray-900 p-4 shadow-lg flex flex-col overflow-y-auto rounded-r-xl z-10">
+        <!-- Logo and Title -->
+        <div class="flex flex-col items-center mb-8">
+            <!-- SVG Logo for Library -->
+             <img src="albayan_logo.jpg" class="Logo">
+
+            <h1 class="text-2xl font-extrabold text-gray-100 text-center">Library System</h1>
+        </div>
+        
+        <!-- Navigation Tabs -->
+        <nav class="flex-grow">
+            <ul class="flex flex-col space-y-2">
+                <li><button class="nav-link w-full text-left px-4 py-2 rounded-md font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition duration-150 ease-in-out" data-section="dashboard-section"><i class="fas fa-tachometer-alt mr-3"></i>Dashboard</button></li>
+                <li><button class="nav-link w-full text-left px-4 py-2 rounded-md font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition duration-150 ease-in-out" data-section="catalog-section"><i class="fas fa-book-open mr-3"></i>Catalog</button></li>
+                <li><button class="nav-link w-full text-left px-4 py-2 rounded-md font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition duration-150 ease-in-out" data-section="issue-section"><i class="fas fa-exchange-alt mr-3"></i>Issue/Return</button></li>
+                <li><button class="nav-link w-full text-left px-4 py-2 rounded-md font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition duration-150 ease-in-out" data-section="history-section"><i class="fas fa-history mr-3"></i>History</button></li>
+                <li><button class="nav-link w-full text-left px-4 py-2 rounded-md font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition duration-150 ease-in-out" data-section="user-management-section"><i class="fas fa-users mr-3"></i>Users</button></li>
+                <li><button class="nav-link w-full text-left px-4 py-2 rounded-md font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition duration-150 ease-in-out" data-section="librarian-section"><i class="fas fa-user-tie mr-3"></i>Librarian</button></li>
+                <li><button class="nav-link w-full text-left px-4 py-2 rounded-md font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition duration-150 ease-in-out" data-section="status-section"><i class="fas fa-info-circle mr-3"></i>Status</button></li>
+            </ul>
+        </nav>
+        <p id="currentLoggedInUserIdDisplay" class="text-gray-400 text-sm mt-auto text-center">Status: Local Admin Access (No Backend)</p>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow ml-64 p-6"> <!-- Push content to the right by sidebar width -->
+        <div class="container mx-auto bg-white rounded-xl shadow-2xl max-w-5xl w-full">
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="section-content p-6 bg-gray-100 rounded-lg shadow-inner active">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Dashboard Overview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <p class="text-5xl font-extrabold text-gray-800" id="totalBooksCount">0</p>
+                        <p class="text-lg text-gray-600 mt-2">Total Books</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <p class="text-5xl font-extrabold text-yellow-600" id="issuedBooksCount">0</p>
+                        <p class="text-lg text-gray-600 mt-2">Issued Books</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <p class="text-5xl font-extrabold text-green-600" id="totalUsersCount">0</p>
+                        <p class="text-lg text-gray-600 mt-2">Total Users</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <p class="text-5xl font-extrabold text-purple-600" id="totalLibrariansCount">0</p>
+                        <p class="text-lg text-gray-600 mt-2">Total Librarians</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Catalog Section (Original Book List and Add Book Form) -->
+            <div id="catalog-section" class="section-content p-6 bg-gray-100 rounded-lg shadow-inner">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Book Catalog</h2>
+                
+                <!-- Add Book Form -->
+                <div class="mb-10 p-6 bg-gray-200 rounded-lg shadow-sm">
+                    <h3 id="bookFormTitle" class="text-xl font-bold text-gray-800 mb-4 text-center">Add New Book</h3>
+                    <form id="bookForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                            <input type="text" id="title" name="title" placeholder="Enter book title" required
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="author" class="block text-sm font-medium text-gray-700 mb-1">Author</label>
+                            <input type="text" id="author" name="author" placeholder="Enter author's name" required
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="isbn" class="block text-sm font-medium text-gray-700 mb-1">ISBN</label>
+                            <input type="text" id="isbn" name="isbn" placeholder="Enter ISBN (e.g., 1234567890)" required
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="catalogNumber" class="block text-sm font-medium text-gray-700 mb-1">Catalog Number</label>
+                            <input type="text" id="catalogNumber" name="catalogNumber" placeholder="Enter unique catalog number" required
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="publishingYear" class="block text-sm font-medium text-gray-700 mb-1">Publishing Year</label>
+                            <input type="number" id="publishingYear" name="publishingYear" placeholder="e.g., 2023" min="1000" max="2099" required
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="publisher" class="block text-sm font-medium text-gray-700 mb-1">Publisher</label>
+                            <input type="text" id="publisher" name="publisher" placeholder="Enter publisher's name" required
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="bookPrice" class="block text-sm font-medium text-gray-700 mb-1">Book Price</label>
+                            <input type="number" id="bookPrice" name="bookPrice" placeholder="e.g., 25.99" min="0" step="0.01" required
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                            <select id="category" name="category" required
+                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                                <option value="">-- Select Category --</option>
+                                <option value="Fiqh">Fiqh</option>
+                                <option value="Hadees">Hadees</option>
+                                <option value="General">General</option>
+                                <option value="Science">Science</option>
+                                <option value="History">History</option>
+                                <option value="Fiction">Fiction</option>
+                                <option value="novel">novel</option>
+                                <option value="family">family</option>
+                                <option value="grammer">grammer</option>
+
+                                <option value="Non-Fiction">Non-Fiction</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="totalCopies" class="block text-sm font-medium text-gray-700 mb-1">Number of Copies</label>
+                            <input type="number" id="totalCopies" name="totalCopies" placeholder="Enter number of copies" min="1" value="1" required
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                        </div>
+                        <div class="flex items-center mt-6 md:mt-0">
+                            <input type="checkbox" id="read" name="read"
+                                   class="h-5 w-5 text-gray-600 border-gray-300 rounded focus:ring-gray-600">
+                            <label for="read" class="ml-2 block text-sm font-medium text-gray-700">I have read this book</label>
+                        </div>
+                        <div class="md:col-span-2 flex justify-center space-x-4">
+                            <button type="submit" id="bookFormSubmitBtn"
+                                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-800 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700 transition duration-150 ease-in-out transform hover:scale-105">
+                                <i class="fas fa-plus-circle mr-3"></i>
+                                Add Book
+                            </button>
+                            <button type="button" id="cancelBookEditBtn"
+                                    class="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700 transition duration-150 ease-in-out transform hover:scale-105 hidden">
+                                <i class="fas fa-times-circle mr-3"></i>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div id="bookList">
+                    <!-- Book tables will be dynamically inserted here by category -->
+                </div>
+                <p id="noBooksMessage" class="text-center text-gray-500 mt-8 text-lg hidden">No books in your library yet. Add one above!</p>
+            </div>
+
+            <!-- Issue/Return Section -->
+            <div id="issue-section" class="section-content p-6 bg-gray-100 rounded-lg shadow-inner">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Issue and Return Books</h2>
+
+                <div class="mb-8 p-6 bg-gray-200 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Issue Book</h3>
+                    <form id="issueBookForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="catalogNumberSearch" class="block text-sm font-medium text-gray-700 mb-1">Search Book by Catalog Number</label>
+                            <div class="flex">
+                                <input type="text" id="catalogNumberSearch" name="catalogNumberSearch" placeholder="Enter catalog number"
+                                       class="flex-grow px-4 py-2 border border-gray-300 rounded-l-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                                <button type="button" id="searchBookBtn"
+                                        class="px-4 py-2 bg-gray-700 text-white rounded-r-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-600 transition duration-150 ease-in-out">
+                                    <i class="fas fa-search"></i> <span class="sr-only">Search Book</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="issueUserIdSearch" class="block text-sm font-medium text-gray-700 mb-1">Search User by ID</label>
+                            <div class="flex">
+                                <input type="text" id="issueUserIdSearch" name="issueUserIdSearch" placeholder="Enter User ID"
+                                       class="flex-grow px-4 py-2 border border-gray-300 rounded-l-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                                <button type="button" id="searchUserInIssueBtn"
+                                        class="px-4 py-2 bg-gray-700 text-white rounded-r-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-600 transition duration-150 ease-in-out">
+                                    <i class="fas fa-search"></i> <span class="sr-only">Search User</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="issueLibrarianSelect" class="block text-sm font-medium text-gray-700 mb-1">Select Librarian</label>
+                            <select id="issueLibrarianSelect" name="issueLibrarianSelect" required
+                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                                <option value="">-- Select Librarian --</option>
+                                <!-- Librarians will be dynamically inserted here -->
+                            </select>
+                        </div>
+                        <div id="selectedBookDisplay" class="md:col-span-2 p-4 bg-white rounded-md shadow-sm border border-gray-200 hidden">
+                            <p class="text-gray-800 font-semibold mb-1">Selected Book:</p>
+                            <p class="text-gray-700"><strong class="font-medium">Title:</strong> <span id="selectedBookTitle"></span></p>
+                            <p class="text-gray-700"><strong class="font-medium">Author:</strong> <span id="selectedBookAuthor"></span></p>
+                            <p class="text-gray-700"><strong class="font-medium">ISBN:</strong> <span id="selectedBookISBN"></span></p>
+                            <p class="text-gray-700"><strong class="font-medium">Catalog No.:</strong> <span id="selectedBookCatalogNumber"></span></p>
+                            <p class="text-gray-700"><strong class="font-medium">Available Copies:</strong> <span id="selectedBookAvailableCopies"></span></p>
+                        </div>
+                        <div id="selectedUserDisplay" class="md:col-span-2 p-4 bg-white rounded-md shadow-sm border border-gray-200 hidden">
+                            <p class="text-gray-800 font-semibold mb-1">Selected User:</p>
+                            <p class="text-gray-700"><strong class="font-medium">Name:</strong> <span id="selectedUserName"></span></p>
+                            <p class="text-gray-700"><strong class="font-medium">Class:</strong> <span id="selectedUserClass"></span></p>
+                        </div>
+                        <div class="md:col-span-2 flex justify-center">
+                            <button type="submit" id="issueBookSubmitBtn" disabled
+                                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-700 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-600 transition duration-150 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <i class="fas fa-hand-holding-usd mr-3"></i>
+                                Issue Book
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Currently Issued Books</h3>
+                <div id="issuedBooksList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Issued book cards will be dynamically inserted here -->
+                </div>
+                <p id="noIssuedBooksMessage" class="text-center text-gray-500 mt-8 text-lg hidden">No books currently issued.</p>
+            </div>
+
+            <!-- History Section -->
+            <div id="history-section" class="section-content p-6 bg-gray-100 rounded-lg shadow-inner">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Transaction History</h2>
+                <div class="mb-8 p-6 bg-gray-200 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Search History by User</h3>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input type="text" id="historyUserIdSearch" name="historyUserIdSearch" placeholder="Enter User ID to search"
+                               class="flex-grow px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                        <button type="button" id="searchHistoryBtn"
+                                class="px-6 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-600 transition duration-150 ease-in-out">
+                            <i class="fas fa-search mr-2"></i> Search History
+                        </button>
+                    </div>
+                </div>
+                <div id="historyTableContainer" class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-2 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Book Name</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">User Name</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Issue Date</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Return Date</th>
+                                <th class="px-4 py-2 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Librarian</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- History table rows will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+                <p id="noHistoryMessage" class="text-center text-gray-500 mt-8 text-lg hidden">No history entries yet.</p>
+            </div>
+
+            <!-- User Management Section -->
+            <div id="user-management-section" class="section-content p-6 bg-gray-100 rounded-lg shadow-inner">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">User Management</h2>
+
+                <div class="mb-8 p-6 bg-gray-200 rounded-lg shadow-sm">
+                    <h3 id="userFormTitle" class="text-xl font-bold text-gray-800 mb-4 text-center">Add New User</h3>
+                    <form id="addUserForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="newUserId" class="block text-sm font-medium text-gray-700 mb-1">User ID (Optional)</label>
+                            <input type="text" id="newUserId" name="newUserId" placeholder="Leave empty for auto-generate"
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="newUserName" class="block text-sm font-medium text-gray-700 mb-1">User Full Name</label>
+                            <input type="text" id="newUserName" name="newUserName" placeholder="Enter user's full name" required
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="newUserType" class="block text-sm font-medium text-gray-700 mb-1">User Type</label>
+                            <select id="newUserType" name="newUserType" required
+                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                                <option value="">-- Select Type --</option>
+                                <option value="Student">Student</option>
+                                <option value="Usthad">Usthad</option>
+                            </select>
+                        </div>
+                        <div id="newUserClassGroup">
+                            <label for="newUserClass" class="block text-sm font-medium text-gray-700 mb-1">User Class (1-7)</label>
+                            <select id="newUserClass" name="newUserClass" required
+                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                                <!-- Options 1-6 will be generated by JS -->
+                            </select>
+                        </div>
+                        <div class="md:col-span-2 flex justify-center space-x-4">
+                            <button type="submit" id="userFormSubmitBtn"
+                                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-800 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700 transition duration-150 ease-in-out transform hover:scale-105 w-full sm:w-auto">
+                                <i class="fas fa-user-plus mr-3"></i>
+                                Add User
+                            </button>
+                            <button type="button" id="cancelUserEditBtn"
+                                    class="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700 transition duration-150 ease-in-out transform hover:scale-105 hidden">
+                                <i class="fas fa-times-circle mr-3"></i>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Registered Users (Students)</h3>
+                <div id="userList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                    <!-- User columns by class will be dynamically inserted here -->
+                    <!-- The noUsersMessage will be dynamically inserted here by JS -->
+                </div>
+                <div id="usthadList" class="mt-8">
+                    <h4 class="text-lg font-bold text-gray-800 mb-4 text-center">Usthad Users</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="usthadUsersContainer">
+                        <!-- Usthad user cards will be dynamically inserted here -->
+                    </div>
+                    <p id="noUsthadMessage" class="text-center text-gray-500 mt-4 text-lg hidden">No Usthad users registered yet.</p>
+                </div>
+            </div>
+
+            <!-- Librarian Section (New) -->
+            <div id="librarian-section" class="section-content p-6 bg-gray-100 rounded-lg shadow-inner">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Librarian Management</h2>
+                
+                <div class="mb-8 p-6 bg-gray-200 rounded-lg shadow-sm">
+                    <h3 id="librarianFormTitle" class="text-xl font-bold text-gray-800 mb-4 text-center">Add New Librarian</h3>
+                    <form id="addLibrarianForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="newLibrarianName" class="block text-sm font-medium text-gray-700 mb-1">Librarian Full Name</label>
+                            <input type="text" id="newLibrarianName" name="newLibrarianName" placeholder="Enter librarian's full name" required
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="newLibrarianPosition" class="block text-sm font-medium text-gray-700 mb-1">Librarian Position</label>
+                            <select id="newLibrarianPosition" name="newLibrarianPosition" required
+                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-gray-600 focus:border-gray-600 sm:text-sm">
+                                <option value="">-- Select Position --</option>
+                                <option value="Chairman">Chairman</option>
+                                <option value="Convener">Convener</option>
+                                <option value="Assistant">Assistant</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2 flex justify-center space-x-4 mt-4">
+                            <button type="submit" id="librarianFormSubmitBtn"
+                                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-800 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700 transition duration-150 ease-in-out transform hover:scale-105 w-full sm:w-auto">
+                                <i class="fas fa-user-plus mr-3"></i>
+                                Add Librarian
+                            </button>
+                            <button type="button" id="cancelLibrarianEditBtn"
+                                    class="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700 transition duration-150 ease-in-out transform hover:scale-105 hidden">
+                                <i class="fas fa-times-circle mr-3"></i>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Registered Librarians</h3>
+                <div id="librarianList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Librarian cards will be dynamically inserted here -->
+                </div>
+                <p id="noLibrariansMessage" class="text-center text-gray-500 mt-8 text-lg hidden">No librarians registered yet.</p>
+            </div>
+
+            <!-- Status Section (New) -->
+            <div id="status-section" class="section-content p-6 bg-gray-100 rounded-lg shadow-inner">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Application Status</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">System Information</h3>
+                        <p class="mb-2 text-gray-700"><strong>Current System Time:</strong> <span id="currentTime"></span></p>
+                        <p class="mb-2 text-gray-700"><strong>Last Data Sync:</strong> <span id="lastSyncTime">N/A (Local Storage)</span></p>
+                        <p class="mb-2 text-gray-700"><strong>Total Records Stored:</strong> <span id="totalRecords">0</span></p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Most Frequent Readers</h3>
+                        <ul id="frequentReadersList" class="list-disc list-inside text-left text-gray-700">
+                            <!-- Frequent readers will be dynamically inserted here -->
+                        </ul>
+                        <p id="noFrequentReadersMessage" class="text-center text-gray-500 text-sm mt-4 hidden">No reader data available yet.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md md:col-span-2">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Most Popular Books</h3>
+                        <ul id="popularBooksList" class="list-disc list-inside text-left text-gray-700">
+                            <!-- Popular books will be dynamically inserted here -->
+                        </ul>
+                        <p id="noPopularBooksMessage" class="text-center text-gray-500 text-sm mt-4 hidden">No book popularity data available yet.</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-6 text-center">More detailed status information will be available here in future updates.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Custom JavaScript -->
+<script src="script.js"></script>
+  
+</body>
+</html>
